@@ -10,6 +10,31 @@ html, body, #app-root {
 /* ビューワーコンテナ内でのスクロールは許可（ズーム操作用） */
 #viewerContainer {
   overflow: auto;
+  /* スクロールバーを非表示にする（機能は維持） */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* WebKit系ブラウザ（Chrome, Safari）でスクロールバーを非表示 */
+#viewerContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* カスタムタイトルバー */
+.custom-titlebar {
+  -webkit-app-region: drag;
+  user-select: none;
+  height: 32px;
+}
+
+.window-btn {
+  -webkit-app-region: no-drag;
+  transition: background-color 0.2s, color 0.2s;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 画像コンテナの背景など */

@@ -20,8 +20,11 @@ export const SELECTORS = {
   zoomInBtn: '#zoomInBtn',
   zoomOutBtn: '#zoomOutBtn',
   zoomResetBtn: '#zoomResetBtn',
-  screenFitBtn: '#screenFitBtn'
-};;
+  screenFitBtn: '#screenFitBtn',
+  minimizeBtn: '#minimizeBtn',
+  maximizeBtn: '#maximizeBtn',
+  closeBtn: '#closeBtn'
+};
 
 // アプリケーション設定
 export const APP_CONFIG = {

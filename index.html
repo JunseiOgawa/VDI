@@ -9,8 +9,30 @@
 
   <body class="min-h-dvh bg-gray-50 text-gray-900">
   <main class="h-dvh flex flex-col w-full">
-      <header class="flex items-center justify-between shrink-0">
-        <h1 class="text-xl font-semibold m-0">VDI 画像ビューワー</h1>
+      <!-- カスタムタイトルバー -->
+      <div class="custom-titlebar flex items-center justify-between bg-gray-100 px-2 py-1 border-b border-gray-300">
+        <h1 class="text-sm font-medium text-gray-700 ml-2">VDI 画像ビューワー</h1>
+        <div class="flex items-center">
+          <button id="minimizeBtn" class="window-btn hover:bg-gray-200 p-1 rounded" aria-label="最小化">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 7h8v1H2V7z" fill="currentColor"/>
+            </svg>
+          </button>
+          <button id="maximizeBtn" class="window-btn hover:bg-gray-200 p-1 rounded" aria-label="最大化">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 2v8h8V2H2zm1 1h6v6H3V3z" fill="currentColor"/>
+            </svg>
+          </button>
+          <button id="closeBtn" class="window-btn hover:bg-red-500 hover:text-white p-1 rounded" aria-label="閉じる">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <header class="flex items-center justify-between shrink-0 p-2">
+        <div></div>
         <div class="flex items-center gap-2">
           <button id="zoomOutBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="縮小 (−)">−</button>
           <button id="zoomResetBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="リセット">100%</button>

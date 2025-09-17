@@ -6,6 +6,8 @@ export interface ZoomState {
   isDragging: boolean;
   dragStartX: number;
   dragStartY: number;
+  // 画面フィットがユーザー操作で解除されていない限り有効
+  isFitActive: boolean;
 }
 
 // タッチ操作の型定義

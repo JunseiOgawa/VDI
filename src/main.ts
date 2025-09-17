@@ -80,6 +80,51 @@ class VDIApp {
    */
   private setupEventListeners(): void {
     this.zoomEventHandler.setupEventListeners();
+    this.setupWindowControls();
+
+    // ウィンドウのリサイズ時、画面フィットが有効なら常に再フィット
+    window.addEventListener('resize', () => this.zoomController.refitIfActive());
+  }
+
+  /**
+   * カスタムウィンドウ制御ボタンの設定
+   */
+  private async setupWindowControls(): Promise<void> {
+    try {
+      const { getCurrentWindow } = await import('@tauri-apps/api/window');
+      
+      const minimizeBtn = DOMHelper.querySelector<HTMLButtonElement>(SELECTORS.minimizeBtn);
+      const maximizeBtn = DOMHelper.querySelector<HTMLButtonElement>(SELECTORS.maximizeBtn);
+      const closeBtn = DOMHelper.querySelector<HTMLButtonElement>(SELECTORS.closeBtn);
+
+      if (minimizeBtn) {
+        minimizeBtn.addEventListener('click', async () => {
+          const appWindow = getCurrentWindow();
+          await appWindow.minimize();
+        });
+      }
+
+      if (maximizeBtn) {
+        maximizeBtn.addEventListener('click', async () => {
+          const appWindow = getCurrentWindow();
+          const isMaximized = await appWindow.isMaximized();
+          if (isMaximized) {
+            await appWindow.unmaximize();
+          } else {
+            await appWindow.maximize();
+          }
+        });
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener('click', async () => {
+          const appWindow = getCurrentWindow();
+          await appWindow.close();
+        });
+      }
+    } catch (error) {
+      console.error('Failed to setup window controls:', error);
+    }
   }
 
   /**

@@ -11,7 +11,6 @@
   <main class="h-dvh flex flex-col w-full">
       <!-- カスタムタイトルバー -->
       <div class="custom-titlebar flex items-center justify-between bg-gray-100 px-2 py-1 border-b border-gray-300">
-        <h1 class="text-sm font-medium text-gray-700 ml-2">VDI 画像ビューワー</h1>
         <div class="flex items-center">
           <button id="minimizeBtn" class="window-btn hover:bg-gray-200 p-1 rounded" aria-label="最小化">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -35,18 +34,25 @@
         <div></div>
         <div class="flex items-center gap-2">
           <button id="zoomOutBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="縮小 (−)">−</button>
-          <button id="zoomResetBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="リセット">リセット</button>
+          <button id="zoomResetBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="リセット">100%</button>
           <button id="zoomInBtn" class="btn btn-primary px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700" aria-label="拡大 (+)">＋</button>
           <button id="screenFitBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="画面フィット">画面フィット</button>
         </div>
       </header>
 
+
       <section id="viewerContainer" class="relative viewer-bg rounded-lg border border-gray-200 flex-1 min-h-0 w-full select-none overflow-auto">
         <!--画像の表示用-->
-  <img id="viewer" alt="画像表示ビューワー" class="max-w-none h-auto block will-change-transform" draggable="false" />
+        <img id="viewer" alt="画像表示ビューワー" class="max-w-none h-auto block will-change-transform" draggable="false" />
+        <!-- ナビゲーション要素 -->
+        <div id="navLeft" class="nav-arrow nav-left"></div>
+        <div id="navRight" class="nav-arrow nav-right"></div>
       </section>
-      <footer class="text-center text-sm text-gray-600 shrink-0">
-      <p id="status" class="text-center text-sm text-gray-600 m-0"></p>
+
+
+      <footer class="flex items-center justify-between text-sm text-gray-600 shrink-0 px-2">
+        <p class="text text-gray-400">VirtualDesktopImager エーテル製</p>
+        <p id="status" class="text-center text-sm text-gray-600 m-0"></p>
       </footer>
     </main>
   </body>

@@ -60,11 +60,24 @@ class VDIApp {
     if (this.viewerEl) {
       // ズームコントローラーに画像要素を設定
       this.zoomController.setViewerElement(this.viewerEl);
+      // ズーム倍率の変更をフッターに反映する
+      this.zoomController.setOnScaleChange((scale) => {
+        if (this.statusEl) {
+          this.statusDisplay.updateZoomInfo(scale);
+        }
+      });
       // 画像ローダーに画像要素を設定
       this.imageLoader.setViewerElement(this.viewerEl);
-      // 画像読み込み完了時に自動でfitToScreenを実行するコールバックを設定
+      // 画像読み込み完了時に自動でfitToScreenを実行し、ステータス表示を更新するコールバックを設定
       this.imageLoader.setOnImageLoadCallback(() => {
         this.zoomController.fitToScreen();
+        // ナビゲーション後のステータス表示更新
+        if (this.statusEl) {
+          const currentPath = this.imageLoader.getCurrentImagePath();
+          if (currentPath) {
+            this.statusDisplay.showImagePath(currentPath);
+          }
+        }
       });
     }
 
@@ -81,6 +94,7 @@ class VDIApp {
   private setupEventListeners(): void {
     this.zoomEventHandler.setupEventListeners();
     this.setupWindowControls();
+    this.setupNavigationControls();
 
     // ウィンドウのリサイズ時、画面フィットが有効なら常に再フィット
     window.addEventListener('resize', () => this.zoomController.refitIfActive());
@@ -128,6 +142,53 @@ class VDIApp {
   }
 
   /**
+   * ナビゲーション矢印の制御設定
+   * 前の写真/次の写真への移動機能（後で実装予定）
+   */
+  private setupNavigationControls(): void {
+    const navLeft = DOMHelper.querySelector<HTMLDivElement>(SELECTORS.navLeft);
+    const navRight = DOMHelper.querySelector<HTMLDivElement>(SELECTORS.navRight);
+
+    if (navLeft) {
+      navLeft.addEventListener('click', async () => {
+        // backphoto機能：前の写真に移動
+        try {
+          const success = await this.imageLoader.previousImage();
+          if (success && this.statusEl) {
+            const currentPath = this.imageLoader.getCurrentImagePath();
+            if (currentPath) {
+              this.statusDisplay.showImagePath(currentPath);
+            }
+          } else {
+            console.log('前の写真はありません');
+          }
+        } catch (error) {
+          console.error('前の写真への移動に失敗しました:', error);
+        }
+      });
+    }
+
+    if (navRight) {
+      navRight.addEventListener('click', async () => {
+        // nextphoto機能：次の写真に移動
+        try {
+          const success = await this.imageLoader.nextImage();
+          if (success && this.statusEl) {
+            const currentPath = this.imageLoader.getCurrentImagePath();
+            if (currentPath) {
+              this.statusDisplay.showImagePath(currentPath);
+            }
+          } else {
+            console.log('次の写真はありません');
+          }
+        } catch (error) {
+          console.error('次の写真への移動に失敗しました:', error);
+        }
+      });
+    }
+  }
+
+  /**
    * 初期画像の読み込み処理
    * - statusDisplay.showLoadingMessage(): ローディングメッセージ表示
    * - imageLoader.loadLaunchImage(): 起動時画像の読み込み
@@ -148,6 +209,21 @@ class VDIApp {
       // 読み込み失敗時は「画像なし」メッセージを表示
       this.statusDisplay.showNoImageMessage();
     }
+  }
+
+  /**
+   * フォルダナビゲーション機能のON/OFF設定
+   * 将来的に第3引数から制御される予定
+   */
+  setFolderNavigationEnabled(enabled: boolean): void {
+    this.imageLoader.setFolderNavigationEnabled(enabled);
+  }
+
+  /**
+   * フォルダナビゲーション機能の状態を取得
+   */
+  getFolderNavigationEnabled(): boolean {
+    return this.imageLoader.getFolderNavigationEnabled();
   }
 }
 

@@ -5,6 +5,7 @@ export class ZoomController {
   private zoomState: ZoomState;
   private touchState: TouchState;
   private viewerElement: HTMLImageElement | null = null;
+  private onScaleChange?: (scale: number) => void;
 
   constructor() {
     this.zoomState = {
@@ -28,6 +29,11 @@ export class ZoomController {
   setViewerElement(element: HTMLImageElement): void {
     this.viewerElement = element;
     this.setupInitialStyles();
+  }
+
+  // スケール変更時のコールバック登録
+  setOnScaleChange(cb: (scale: number) => void): void {
+    this.onScaleChange = cb;
   }
 
   private setupInitialStyles(): void {
@@ -59,6 +65,14 @@ export class ZoomController {
     
     this.viewerElement.style.transform = 
       `translate(${this.zoomState.translateX}px, ${this.zoomState.translateY}px) scale(${this.zoomState.scale})`;
+    // スケール表示を更新するためのコールバックを通知
+    if (this.onScaleChange) {
+      try {
+        this.onScaleChange(this.zoomState.scale);
+      } catch (err) {
+        console.error('onScaleChange callback error:', err);
+      }
+    }
   }
 
   // 拡大

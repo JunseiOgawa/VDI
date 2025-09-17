@@ -24,7 +24,9 @@ export const SELECTORS = {
   screenFitBtn: '#screenFitBtn',
   minimizeBtn: '#minimizeBtn',
   maximizeBtn: '#maximizeBtn',
-  closeBtn: '#closeBtn'
+  closeBtn: '#closeBtn',
+  navLeft: '#navLeft',
+  navRight: '#navRight'
 };
 
 // アプリケーション設定

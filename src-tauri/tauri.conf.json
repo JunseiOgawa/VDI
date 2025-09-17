@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.junse.vdi",
   "build": {
-    "beforeDevCommand": "npm run dev",
+  "beforeDevCommand": "",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
@@ -19,9 +19,15 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' asset: http://asset.localhost;",
+      "assetProtocol": {
+        "enable": true,
+        "scope": ["**"]
+      }
     }
+    
   },
+  
   "bundle": {
     "active": true,
     "targets": "all",

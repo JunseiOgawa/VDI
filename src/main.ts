@@ -1,27 +1,64 @@
-import { convertFileSrc } from '@tauri-apps/api/core';
-import { invoke } from '@tauri-apps/api/core';
+import { DOMHelper } from './features/utils';
+import { ZoomController, ZoomEventHandler } from './features/zoom';
+import { ImageLoader, StatusDisplay } from './features/imageViewer';
+import { SELECTORS } from './config';
 
-let viewerEl: HTMLImageElement | null = null;
-let statusEl: HTMLParagraphElement | null = null;
+class VDIApp {
+  private zoomController: ZoomController;
+  private zoomEventHandler: ZoomEventHandler;
+  private imageLoader: ImageLoader;
+  private statusDisplay: StatusDisplay;
 
-async function showLaunchImage() {
-  //rustのcommandから画像パスの入手
-  const path = await invoke<string | null>('get_launch_image_path');
+  private viewerEl: HTMLImageElement | null = null;
+  private statusEl: HTMLParagraphElement | null = null;
 
-  if (!viewerEl || !statusEl) return;
+  constructor() {
+    this.zoomController = new ZoomController();
+    this.zoomEventHandler = new ZoomEventHandler(this.zoomController);
+    this.imageLoader = new ImageLoader();
+    this.statusDisplay = new StatusDisplay();
+  }
 
-  if (path && path.length > 0) {
-    //ローカルファイル画像のURL変換
-    const url = convertFileSrc(path);
-    viewerEl.src = url;
-    statusEl.textContent = `表示中の画像パス: ${path}`;
-  }else {
-    statusEl.textContent = '表示する画像がありません。';
+  async initialize(): Promise<void> {
+    this.setupElements();
+    this.setupEventListeners();
+    await this.loadInitialImage();
+  }
+
+  private setupElements(): void {
+    this.viewerEl = DOMHelper.querySelector<HTMLImageElement>(SELECTORS.viewer);
+    this.statusEl = DOMHelper.querySelector<HTMLParagraphElement>(SELECTORS.status);
+
+    if (this.viewerEl) {
+      this.zoomController.setViewerElement(this.viewerEl);
+      this.imageLoader.setViewerElement(this.viewerEl);
+    }
+
+    if (this.statusEl) {
+      this.statusDisplay.setStatusElement(this.statusEl);
+    }
+  }
+
+  private setupEventListeners(): void {
+    this.zoomEventHandler.setupEventListeners();
+  }
+
+  private async loadInitialImage(): Promise<void> {
+    this.statusDisplay.showLoadingMessage();
+    
+    const imagePath = await this.imageLoader.loadLaunchImage();
+    
+    if (imagePath) {
+      this.statusDisplay.showImagePath(imagePath);
+    } else {
+      this.statusDisplay.showNoImageMessage();
+    }
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  viewerEl = document.querySelector('#viewer');
-  statusEl = document.querySelector('#status');
-  showLaunchImage();
+// アプリケーションの初期化
+window.addEventListener('DOMContentLoaded', async () => {
+  const app = new VDIApp();
+  await app.initialize();
 });
+

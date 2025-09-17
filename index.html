@@ -4,18 +4,26 @@
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="/src/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri App</title>
     <script type="module" src="/src/main.ts" defer></script>
   </head>
 
-  <body>
-    <main class="container">
-      <!--画像の表示用-->
-      <img id="viewer"
-      alt="画像表示ビューワー"
-      style="max-width: 100%; max-height: 80hv; object-fit: contain; display: block; margin: 0 auto;"
-      />
-      <p id="status" style="text-align: center;"></p>
+  <body class="min-h-dvh bg-gray-50 text-gray-900">
+    <main class="mx-auto max-w-6xl p-4 space-y-3">
+      <header class="flex items-center justify-between">
+        <h1 class="text-xl font-semibold">VDI 画像ビューワー</h1>
+        <div class="flex items-center gap-2">
+          <button id="zoomOutBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="縮小 (−)">−</button>
+          <button id="zoomResetBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="リセット">100%</button>
+          <button id="zoomInBtn" class="btn btn-primary px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700" aria-label="拡大 (+)">＋</button>
+        </div>
+      </header>
+
+      <section id="viewerContainer" class="relative viewer-bg rounded-lg border border-gray-200 overflow-hidden h-[70vh] flex items-center justify-center select-none">
+        <!--画像の表示用-->
+        <img id="viewer" alt="画像表示ビューワー" class="max-w-none will-change-transform" draggable="false" />
+      </section>
+
+      <p id="status" class="text-center text-sm text-gray-600"></p>
     </main>
   </body>
 </html>

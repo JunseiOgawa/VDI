@@ -36,6 +36,23 @@ export class ZoomController {
     this.viewerElement.style.transformOrigin = '0 0';
   }
 
+  // コンテナに収まるスケール（fit）を算出
+  private getFitScale(): number {
+    if (!this.viewerElement) return 1;
+    const container = this.viewerElement.parentElement;
+    if (!container) return 1;
+    const rect = container.getBoundingClientRect();
+    const w = this.viewerElement.naturalWidth;
+    const h = this.viewerElement.naturalHeight;
+    if (!w || !h) return 1;
+    return Math.min(rect.width / w, rect.height / h);
+  }
+
+  // 下限スケール（アップスケールは許容しない方針）
+  private getMinScale(): number {
+    return Math.min(1, this.getFitScale());
+  }
+
   applyTransform(): void {
     if (!this.viewerElement) return;
     
@@ -50,19 +67,59 @@ export class ZoomController {
   }
 
   // 縮小
+  // 縮小
   zoomOut(): void {
-    this.zoomState.scale = Math.max(this.zoomState.scale / ZOOM_CONFIG.scaleFactor, ZOOM_CONFIG.minScale);
+    const min = this.getMinScale();
+    this.zoomState.scale = Math.max(min, this.zoomState.scale / ZOOM_CONFIG.scaleFactor);
     this.applyTransform();
   }
 
   // リセット
+  // リセット
   resetZoom(): void {
-    this.zoomState.scale = 1.0;
+    const min = this.getMinScale();
+    this.zoomState.scale = Math.max(1.0, min);
     this.zoomState.translateX = 0;
     this.zoomState.translateY = 0;
     this.applyTransform();
   }
 
+  // 画面フィット
+  // 画面フィット
+  fitToScreen(): void {
+    if (!this.viewerElement) return;
+    
+    const container = this.viewerElement.parentElement;
+    if (!container) return;
+    
+    const containerRect = container.getBoundingClientRect();
+    const imageNaturalWidth = this.viewerElement.naturalWidth;
+    const imageNaturalHeight = this.viewerElement.naturalHeight;
+    
+    if (imageNaturalWidth === 0 || imageNaturalHeight === 0) return;
+    
+    // コンテナに画像を収めるスケールを計算（自然サイズ以上に拡大しない）
+    const scaleX = containerRect.width / imageNaturalWidth;
+    const scaleY = containerRect.height / imageNaturalHeight;
+    const rawScale = Math.min(scaleX, scaleY);
+    const newScale = Math.min(1, rawScale);
+    
+    // スケール後の画像サイズ
+    const scaledImageWidth = imageNaturalWidth * newScale;
+    const scaledImageHeight = imageNaturalHeight * newScale;
+    
+    // コンテナ中央に配置するためのオフセット（直接座標）
+    const translateX = (containerRect.width - scaledImageWidth) / 2;
+    const translateY = (containerRect.height - scaledImageHeight) / 2;
+    
+    // 状態を更新
+    this.zoomState.scale = newScale;
+    this.zoomState.translateX = translateX;
+    this.zoomState.translateY = translateY;
+    this.applyTransform();
+  }
+
+  // ホイールズーム
   // ホイールズーム
   handleWheel(e: WheelEvent): void {
     if (!this.viewerElement) return;
@@ -74,7 +131,8 @@ export class ZoomController {
     const mouseY = e.clientY - rect.top;
     
     const scaleFactor = e.deltaY > 0 ? INTERACTION_CONFIG.wheelScaleFactor : INTERACTION_CONFIG.wheelScaleFactorUp;
-    const newScale = Math.max(ZOOM_CONFIG.minScale, Math.min(ZOOM_CONFIG.maxScale, this.zoomState.scale * scaleFactor));
+    const min = this.getMinScale();
+    const newScale = Math.max(min, Math.min(ZOOM_CONFIG.maxScale, this.zoomState.scale * scaleFactor));
     
     if (newScale !== this.zoomState.scale) {
       const scaleChange = newScale / this.zoomState.scale;
@@ -152,7 +210,8 @@ export class ZoomController {
       );
       
       const scaleChange = currentDistance / this.touchState.initialDistance;
-      const newScale = Math.max(ZOOM_CONFIG.minScale, Math.min(ZOOM_CONFIG.maxScale, this.touchState.initialScale * scaleChange));
+      const min = this.getMinScale();
+      const newScale = Math.max(min, Math.min(ZOOM_CONFIG.maxScale, this.touchState.initialScale * scaleChange));
       
       if (newScale !== this.zoomState.scale) {
         const centerX = (touch1.clientX + touch2.clientX) / 2;

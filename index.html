@@ -8,22 +8,24 @@
   </head>
 
   <body class="min-h-dvh bg-gray-50 text-gray-900">
-    <main class="mx-auto max-w-6xl p-4 space-y-3">
-      <header class="flex items-center justify-between">
-        <h1 class="text-xl font-semibold">VDI 画像ビューワー</h1>
+  <main class="h-dvh flex flex-col w-full">
+      <header class="flex items-center justify-between shrink-0">
+        <h1 class="text-xl font-semibold m-0">VDI 画像ビューワー</h1>
         <div class="flex items-center gap-2">
           <button id="zoomOutBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="縮小 (−)">−</button>
           <button id="zoomResetBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="リセット">100%</button>
           <button id="zoomInBtn" class="btn btn-primary px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700" aria-label="拡大 (+)">＋</button>
+          <button id="screenFitBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="画面フィット">画面フィット</button>
         </div>
       </header>
 
-      <section id="viewerContainer" class="relative viewer-bg rounded-lg border border-gray-200 overflow-hidden h-[70vh] flex items-center justify-center select-none">
+      <section id="viewerContainer" class="relative viewer-bg rounded-lg border border-gray-200 flex-1 min-h-0 w-full select-none overflow-auto">
         <!--画像の表示用-->
-        <img id="viewer" alt="画像表示ビューワー" class="max-w-none will-change-transform" draggable="false" />
+  <img id="viewer" alt="画像表示ビューワー" class="max-w-none h-auto block will-change-transform" draggable="false" />
       </section>
-
-      <p id="status" class="text-center text-sm text-gray-600"></p>
+      <footer class="text-center text-sm text-gray-600 shrink-0">
+      <p id="status" class="text-center text-sm text-gray-600 m-0"></p>
+      </footer>
     </main>
   </body>
 </html>

@@ -11,7 +11,17 @@ fn greet(name: &str) -> String {
 
 #[tauri::command]
 fn get_launch_image_path() -> Option<String> {
-    std::env::args().nth(1)
+    if let Some(path) = std::env::args().nth(1) {
+        // パスの検証：実際にファイルが存在するかチェック
+        if std::path::Path::new(&path).exists() {
+            Some(path)
+        } else {
+            println!("指定されたファイルが存在しません: {}", path);
+            None
+        }
+    } else {
+        None
+    }
 }
 
 //起動引数から２つ目（ウィンドウサイズ指定）を返すコマンド

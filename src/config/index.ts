@@ -2,7 +2,7 @@ import type { ZoomConfig } from '../types';
 
 // 拡大縮小の設定
 export const ZOOM_CONFIG: ZoomConfig = {
-  minScale: 0.1,
+  minScale: 0.5,
   maxScale: 5.0,
   scaleFactor: 1.1
 };
@@ -19,8 +19,9 @@ export const SELECTORS = {
   status: '#status',
   zoomInBtn: '#zoomInBtn',
   zoomOutBtn: '#zoomOutBtn',
-  zoomResetBtn: '#zoomResetBtn'
-};
+  zoomResetBtn: '#zoomResetBtn',
+  screenFitBtn: '#screenFitBtn'
+};;
 
 // アプリケーション設定
 export const APP_CONFIG = {

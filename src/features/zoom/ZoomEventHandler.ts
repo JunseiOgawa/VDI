@@ -18,10 +18,12 @@ export class ZoomEventHandler {
     const zoomInBtn = DOMHelper.querySelector(SELECTORS.zoomInBtn);
     const zoomOutBtn = DOMHelper.querySelector(SELECTORS.zoomOutBtn);
     const zoomResetBtn = DOMHelper.querySelector(SELECTORS.zoomResetBtn);
+    const screenFitBtn = DOMHelper.querySelector(SELECTORS.screenFitBtn);
 
     zoomInBtn?.addEventListener('click', () => this.zoomController.zoomIn());
     zoomOutBtn?.addEventListener('click', () => this.zoomController.zoomOut());
     zoomResetBtn?.addEventListener('click', () => this.zoomController.resetZoom());
+    screenFitBtn?.addEventListener('click', () => this.zoomController.fitToScreen());
   }
 
   private setupViewerEvents(): void {

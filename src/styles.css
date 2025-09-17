@@ -3,6 +3,13 @@
 /* アプリ全体のベースレイアウト調整 */
 html, body, #app-root {
   height: 100%;
+  overflow-x: hidden; /* 横スクロールは禁止 */
+  overflow-y: auto;   /* 縦は必要に応じてスクロール（ズーム操作はviewer側でpreventDefault） */
+}
+
+/* ビューワーコンテナ内でのスクロールは許可（ズーム操作用） */
+#viewerContainer {
+  overflow: auto;
 }
 
 /* 画像コンテナの背景など */

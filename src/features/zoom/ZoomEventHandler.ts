@@ -28,11 +28,23 @@ export class ZoomEventHandler {
 
   private setupViewerEvents(): void {
     const viewerEl = DOMHelper.querySelector<HTMLImageElement>(SELECTORS.viewer);
-    if (!viewerEl) return;
+    const viewerContainerEl = DOMHelper.querySelector(SELECTORS.viewerContainer);
+    if (!viewerEl || !viewerContainerEl) return;
+
+    // section内のスクロールを禁止
+    viewerContainerEl.addEventListener('wheel', (e) => e.preventDefault());
+
+    // img内のスクロールを許可（ズーム）
+    viewerEl.addEventListener('wheel', (e) => this.zoomController.handleWheel(e));
 
     // マウスイベント
-    viewerEl.addEventListener('wheel', (e) => this.zoomController.handleWheel(e));
-    viewerEl.addEventListener('mousedown', (e) => this.zoomController.startDrag(e));
+    viewerContainerEl.addEventListener('mousedown', (e) => {
+      if (e.button === 1) e.preventDefault(); // 中クリック禁止
+    });
+    viewerEl.addEventListener('mousedown', (e) => {
+      if (e.button === 1) e.preventDefault(); // 中クリック禁止
+      else this.zoomController.startDrag(e);
+    });
     viewerEl.addEventListener('mousemove', (e) => this.zoomController.drag(e));
     viewerEl.addEventListener('mouseup', () => this.zoomController.endDrag());
     viewerEl.addEventListener('mouseleave', () => this.zoomController.endDrag());

@@ -16,6 +16,7 @@ export const INTERACTION_CONFIG = {
 // DOM要素のセレクタ
 export const SELECTORS = {
   viewer: '#viewer',
+  viewerContainer: '#viewerContainer',
   status: '#status',
   zoomInBtn: '#zoomInBtn',
   zoomOutBtn: '#zoomOutBtn',

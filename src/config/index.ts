@@ -25,6 +25,8 @@ export const SELECTORS = {
   minimizeBtn: '#minimizeBtn',
   maximizeBtn: '#maximizeBtn',
   closeBtn: '#closeBtn',
+  settingBtn: '#settingBtn',
+  settingsMenu: '#settingsMenu',
   navLeft: '#navLeft',
   navRight: '#navRight'
 };

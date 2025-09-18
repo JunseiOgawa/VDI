@@ -3,6 +3,10 @@ import { ZoomController, ZoomEventHandler } from './features/zoom';
 import { ImageLoader, StatusDisplay } from './features/imageViewer';
 import { ThemeManager } from './features/theme';
 import { SELECTORS } from './config';
+// 旧: sun/moon アイコンは設定メニュー移行により未使用
+import settingIconSvg from './asset/setting_ge_h.svg?raw';
+import reloadIconSvg from './asset/reload_hoso.svg?raw';
+import focusIconSvg from './asset/focus_ca_h.svg?raw';
 
 // ユーティリティ: DOM操作のヘルパー関数 (src/features/utils/DOMHelper.ts)
 // ズーム機能: コントローラーとイベントハンドラー (src/features/zoom/index.ts)
@@ -52,6 +56,8 @@ class VDIApp {
     // テーママネージャーを初期化（OSテーマ自動取得）
     await this.themeManager.initialize();
     this.setupThemeUI();
+    // 固定アイコン(img)をinline SVGへ置き換え（currentColor対応）
+    this.inlineStaticIcons();
     
     this.setupEventListeners();
     await this.loadInitialImage();
@@ -106,7 +112,7 @@ class VDIApp {
     this.zoomEventHandler.setupEventListeners();
     this.setupWindowControls();
     this.setupNavigationControls();
-
+    this.setupSettingsUI();
     // ウィンドウのリサイズ時、画面フィットが有効なら常に再フィット
     window.addEventListener('resize', () => this.zoomController.refitIfActive());
   }
@@ -200,6 +206,24 @@ class VDIApp {
   }
 
   /**
+   * index.html に静的に配置された <img class="icon"> を inline SVG に置き換える
+   * - 対象: #zoomResetBtn 内のリロードアイコン, #screenFitBtn 内のフォーカスアイコン
+   */
+  private inlineStaticIcons(): void {
+    const replaceImgWithInlineSvg = (imgEl: HTMLImageElement | null, rawSvg: string) => {
+      if (!imgEl) return;
+      const decorated = rawSvg.replace('<svg ', '<svg class="icon" width="16" height="16" ');
+      imgEl.outerHTML = decorated;
+    };
+
+    const resetBtnImg = document.querySelector<HTMLImageElement>('#zoomResetBtn img.icon');
+    replaceImgWithInlineSvg(resetBtnImg, reloadIconSvg);
+
+    const focusBtnImg = document.querySelector<HTMLImageElement>('#screenFitBtn img.icon');
+    replaceImgWithInlineSvg(focusBtnImg, focusIconSvg);
+  }
+
+  /**
    * 初期画像の読み込み処理
    * - statusDisplay.showLoadingMessage(): ローディングメッセージ表示
    * - imageLoader.loadLaunchImage(): 起動時画像の読み込み
@@ -242,83 +266,134 @@ class VDIApp {
    * カスタムタイトルバーにテーマ切り替えボタンを追加
    */
   private setupThemeUI(): void {
-    const titlebar = document.querySelector('.custom-titlebar');
-    if (!titlebar) {
-      console.warn('[VDIApp] カスタムタイトルバーが見つかりません');
-      return;
-    }
-
-    // テーマ切り替えボタンを作成
-    const themeButton = document.createElement('button');
-    themeButton.className = 'window-btn theme-toggle-btn';
-    themeButton.title = 'テーマを切り替え (Light/Dark)';
-    themeButton.setAttribute('aria-label', 'テーマ切り替え');
-    
-    // 初期アイコンを設定
-    this.updateThemeButtonIcon(themeButton);
-    
-    // クリックイベントを設定
-    themeButton.addEventListener('click', () => {
-      // アニメーション効果を追加
-      themeButton.classList.add('switching');
-      
-      // テーマを切り替え
-      this.themeManager.toggleTheme();
-      
-      // アイコンを更新
-      setTimeout(() => {
-        this.updateThemeButtonIcon(themeButton);
-        themeButton.classList.remove('switching');
-      }, 150);
-    });
-
-    // ウィンドウ制御ボタンの前に挿入（最小化ボタンを探す）
-    const minimizeBtn = titlebar.querySelector('#minimizeBtn');
-    
-    if (minimizeBtn) {
-      minimizeBtn.parentElement?.insertBefore(themeButton, minimizeBtn);
-      console.log('[VDIApp] テーマ切り替えボタンを最小化ボタンの前に追加しました');
-    } else {
-      // フォールバック: ウィンドウボタンコンテナの最初に追加
-      const windowButtonContainer = titlebar.querySelector('.flex.items-center:last-child');
-      if (windowButtonContainer) {
-        windowButtonContainer.insertBefore(themeButton, windowButtonContainer.firstChild);
-        console.log('[VDIApp] テーマ切り替えボタンをウィンドウボタンコンテナの最初に追加しました');
-      } else {
-        titlebar.appendChild(themeButton);
-        console.log('[VDIApp] テーマ切り替えボタンをタイトルバー末尾に追加しました');
-      }
-    }
-
-    // テーマ変更イベントをリッスン
-    document.addEventListener('themeChanged', (event: Event) => {
-      const customEvent = event as CustomEvent;
-      this.updateThemeButtonIcon(themeButton);
-      console.log(`[VDIApp] テーマが変更されました: ${customEvent.detail?.theme} (ユーザー設定: ${customEvent.detail?.userTheme})`);
-    });
+    // 旧テーマボタンは設定メニューに移行したため、ここでは何もしない（後方互換のため空実装を保持）
   }
 
   /**
    * テーマ切り替えボタンのアイコンを更新
    * @param button テーマ切り替えボタン要素
    */
-  private updateThemeButtonIcon(button: HTMLButtonElement): void {
-    const currentAppliedTheme = this.themeManager.getAppliedTheme();
-    const userTheme = this.themeManager.getCurrentTheme();
-    
-    // アイコンの選択：現在適用されているテーマに基づく
-    if (currentAppliedTheme === 'dark') {
-      button.innerHTML = '☀️'; // ダークモード時は太陽（ライトモードに切り替え可能）
-      button.title = 'ライトモードに切り替え';
-    } else {
-      button.innerHTML = '🌙'; // ライトモード時は月（ダークモードに切り替え可能）
-      button.title = 'ダークモードに切り替え';
-    }
-    
-    // autoモードの場合はタイトルに追記
-    if (userTheme === 'auto') {
-      button.title += ' (自動)';
-    }
+  // 旧テーマトグルボタン用のアイコン更新関数は不要になったため削除
+
+  /**
+   * 設定ボタンとドロップダウンメニューのセットアップ
+   * - ギアアイコンをインラインSVGで描画（currentColorでテーマ連動）
+   * - クリックでメニュー開閉
+   * - メニューからテーマを明示選択（light/dark/auto）
+   */
+  private setupSettingsUI(): void {
+    const settingBtn = DOMHelper.querySelector<HTMLButtonElement>(SELECTORS.settingBtn);
+    const settingsMenu = DOMHelper.querySelector<HTMLDivElement>(SELECTORS.settingsMenu);
+
+    if (!settingBtn || !settingsMenu) return;
+
+    // ギアアイコンを小さくして currentColor を反映（stroke 色を currentColor に）
+    const gear = settingIconSvg
+      .replace('width="48"', 'width="16"')
+      .replace('height="48"', 'height="16"')
+      .replace('<svg ', '<svg class="theme-icon" ')
+      // style定義を除去
+      .replace(/<defs>[\s\S]*?<\/defs>/, '')
+      // クラスベース指定を直接属性へ変換して currentColor を適用
+      .replace(/class="a"/g, 'fill="none" stroke="currentColor" stroke-width="2"')
+      .replace(/class="b"/g, 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"');
+    settingBtn.innerHTML = gear;
+
+    const openMenu = () => {
+      settingsMenu.classList.remove('hidden');
+      settingsMenu.setAttribute('aria-hidden', 'false');
+
+      // 現在のユーザー設定を反映
+      const userTheme = this.themeManager.getCurrentTheme();
+      settingsMenu.querySelectorAll<HTMLButtonElement>('.settings-item').forEach((el) => {
+        const match = el.dataset.theme === userTheme;
+        if (match) {
+          el.setAttribute('aria-checked', 'true');
+        } else {
+          el.removeAttribute('aria-checked');
+        }
+      });
+
+      // レイアウト位置計算（ボタンの左に出す）
+      const btnRect = settingBtn.getBoundingClientRect();
+      const menuRect = settingsMenu.getBoundingClientRect();
+      const margin = 8; // ボタンとメニューの間隔
+      const viewportW = window.innerWidth;
+      const viewportH = window.innerHeight;
+
+      // 基本の左側配置
+      let left = btnRect.left - menuRect.width - margin;
+      let top = btnRect.top + (btnRect.height - menuRect.height) / 2;
+
+      // 画面外はみ出しをクランプ
+      // 横: 左側に出せない時は右側にフォールバック
+      if (left < margin) {
+        left = Math.min(btnRect.right + margin, viewportW - menuRect.width - margin);
+      } else {
+        left = Math.max(margin, Math.min(left, viewportW - menuRect.width - margin));
+      }
+
+      // 縦: 上下にはみ出さないように調整
+      top = Math.max(margin, Math.min(top, viewportH - menuRect.height - margin));
+
+      // 適用
+      settingsMenu.style.left = `${left}px`;
+      settingsMenu.style.top = `${top}px`;
+    };
+
+    const closeMenu = () => {
+      settingsMenu.classList.add('hidden');
+      settingsMenu.setAttribute('aria-hidden', 'true');
+    };
+
+    let isOpen = false;
+
+    settingBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      isOpen ? (closeMenu(), isOpen = false) : (openMenu(), isOpen = true);
+    });
+
+    // メニュー項目クリックでテーマ変更
+    settingsMenu.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const item = target.closest<HTMLButtonElement>('.settings-item');
+      if (!item) return;
+      const value = item.dataset.theme as 'light' | 'dark' | 'auto' | undefined;
+      if (!value) return;
+      this.themeManager.setTheme(value);
+      closeMenu();
+      isOpen = false;
+    });
+
+    // 外側クリックで閉じる
+    document.addEventListener('click', (e) => {
+      if (!isOpen) return;
+      const target = e.target as Node;
+      if (settingsMenu.contains(target) || settingBtn.contains(target as Node)) return;
+      closeMenu();
+      isOpen = false;
+    });
+
+    // Esc で閉じる
+    document.addEventListener('keydown', (e) => {
+      if (!isOpen) return;
+      if (e.key === 'Escape') {
+        closeMenu();
+        isOpen = false;
+      }
+    });
+
+    // テーマ変更イベント時にギアの色は自動で変わる（currentColor）。
+    // 必要ならメニュー開いている最中の選択表示も更新
+    document.addEventListener('themeChanged', () => {
+      if (!isOpen) return;
+      const userTheme = this.themeManager.getCurrentTheme();
+      settingsMenu.querySelectorAll<HTMLButtonElement>('.settings-item').forEach((el) => {
+        const match = el.dataset.theme === userTheme;
+        if (match) el.setAttribute('aria-checked', 'true');
+        else el.removeAttribute('aria-checked');
+      });
+    });
   }
 }
 

@@ -248,21 +248,62 @@ footer p {
   position: relative;
 }
 
+
+
+/* アイコン画像（ボタン内）の基本スタイル */
+.icon,
+.theme-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.theme-toggle-btn .theme-icon {
+  filter: none; /* 将来テーマ毎の色変換が必要ならここで調整 */
+}
+
+/* テーマ連動の色指定: currentColor を使うSVGに反映される */
+.window-btn,
+.theme-toggle-btn {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .window-btn,
+[data-theme="dark"] .theme-toggle-btn {
+  color: var(--text-secondary);
+}
+
+/* 必要に応じて hover 時に強調 */
+.window-btn:hover,
 .theme-toggle-btn:hover {
-  transform: scale(1.1);
+  color: var(--text-primary);
 }
 
-.theme-toggle-btn:active {
-  transform: scale(0.95);
+/* ========================= 設定ドロップダウンメニュー ========================= */
+.settings-menu {
+  -webkit-app-region: no-drag;
+  position: fixed; /* JSでtop/leftを都度設定 */
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-primary);
+  box-shadow: 0 4px 12px var(--shadow);
+  z-index: 50;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  opacity: 1;
 }
 
-/* テーマ切り替えアニメーション */
-.theme-toggle-btn.switching {
-  animation: themeSwitch 0.3s ease-in-out;
+.settings-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--text-secondary);
 }
 
-@keyframes themeSwitch {
-  0% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.2) rotate(180deg); }
-  100% { transform: scale(1) rotate(360deg); }
+.settings-item:hover,
+.settings-item[aria-checked="true"] {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
 }

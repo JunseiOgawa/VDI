@@ -13,23 +13,42 @@
       <div class="custom-titlebar flex items-center justify-end bg-gray-100 px-2 py-5 border-b border-gray-300">
         <div class="flex items-center gap-2 mr-auto">
           <button id="zoomOutBtn" class="btn btn-outline px-2 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="縮小 (−)">−</button>
-          <button id="zoomResetBtn" class="btn btn-outline px-2 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="リセット">100%</button>
+          <button id="zoomResetBtn" class="btn btn-outline px-2 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="リセット">
+            <img class="icon" src="/src/asset/reload_hoso.svg" alt="リセットアイコン" />
+            <span class="ml-1">100%</span>
+          </button>
           <button id="zoomInBtn" class="btn btn-primary px-2 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700" aria-label="拡大 (+)">＋</button>
-          <button id="screenFitBtn" class="btn btn-outline px-2 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="画面フィット">画面フィット</button>
+          <button id="screenFitBtn" class="btn btn-outline px-2 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="画面フィット">
+            <img class="icon" src="/src/asset/focus_ca_h.svg" alt="画面フィット" />
+          </button>
         </div>
-        <div class="flex items-center">
-          <button id="minimizeBtn" class="window-btn hover:bg-gray-200 p-1 rounded-lg" aria-label="最小化">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+        
+        <div class="flex items-center relative">
+          <!-- 設定ボタン（ギアアイコン）。クリックでプルダウンメニューを開く -->
+          <button id="settingBtn" class="window-btn hover:bg-gray-200 p-1 rounded-lg" aria-label="設定" title="設定">
+            <!-- JSでinline SVG（setting_ge_h.svg）を挿入します -->
+          </button>
+          <!-- 設定ドロップダウンメニュー（初期は非表示） -->
+          <div id="settingsMenu" class="settings-menu hidden w-44 rounded-md shadow-lg border" role="menu" aria-hidden="true">
+            <div class="py-1" role="none">
+              <button class="settings-item" data-theme="light" role="menuitem">ライトテーマ</button>
+              <button class="settings-item" data-theme="dark" role="menuitem">ダークテーマ</button>
+              <button class="settings-item" data-theme="auto" role="menuitem">テーマ自動 (OS)</button>
+            </div>
+          </div>
+          <button id="minimizeBtn" class="window-btn hover:bg-gray-200 p-1   rounded-lg" aria-label="最小化">
+            <svg width="20" height="20" viewBox="0 1 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 7h8v1H2V7z" fill="currentColor"/>
             </svg>
           </button>
           <button id="maximizeBtn" class="window-btn hover:bg-gray-200 p-1 rounded-lg" aria-label="最大化">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="20" height="20" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 2v8h8V2H2zm1 1h6v6H3V3z" fill="currentColor"/>
             </svg>
           </button>
           <button id="closeBtn" class="window-btn hover:bg-red-500 hover:text-white p-1 rounded-lg" aria-label="閉じる">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="12" height="20" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
             </svg>
           </button>

@@ -18,6 +18,7 @@ export const SELECTORS = {
   viewer: '#viewer',
   viewerContainer: '#viewerContainer',
   status: '#status',
+  zoomDisplay: '#zoomDisplay',
   zoomInBtn: '#zoomInBtn',
   zoomOutBtn: '#zoomOutBtn',
   zoomResetBtn: '#zoomResetBtn',

@@ -10,7 +10,7 @@
   <body class="min-h-dvh bg-gray-50 text-gray-900">
   <main class="h-dvh flex flex-col w-full">
       <!-- カスタムタイトルバー -->
-      <div class="custom-titlebar flex items-center justify-end bg-gray-100 px-2 py-5 border-b border-gray-300">
+      <div class="custom-titlebar flex items-center justify-end bg-gray-100 px-2 py-3 border-b border-gray-300">
         <div class="flex items-center gap-2 mr-auto">
           <button id="zoomOutBtn" class="btn btn-outline px-2 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="縮小 (−)">−</button>
           <button id="zoomResetBtn" class="btn btn-outline px-2 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="リセット">
@@ -18,7 +18,7 @@
             <span class="ml-1">100%</span>
           </button>
           <button id="zoomInBtn" class="btn btn-primary px-2 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700" aria-label="拡大 (+)">＋</button>
-          <button id="screenFitBtn" class="btn btn-outline px-2 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="画面フィット">
+          <button id="screenFitBtn" class="btn btn-outline px-2 py-0.9 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="画面フィット">
             <img class="icon" src="/src/asset/focus_ca_h.svg" alt="画面フィット" />
           </button>
         </div>
@@ -30,13 +30,27 @@
             <!-- JSでinline SVG（setting_ge_h.svg）を挿入します -->
           </button>
           <!-- 設定ドロップダウンメニュー（初期は非表示） -->
-          <div id="settingsMenu" class="settings-menu hidden w-44  rounded-md shadow-lg border" role="menu" aria-hidden="true">
+          <div id="settingsMenu" class="settings-menu hidden w-56 rounded-md shadow-lg border bg-white dark:bg-gray-800" role="menu" aria-hidden="true">
             <div class="py-1" role="none">
-              <button class="settings-item" data-theme="light" role="menuitem">ライトテーマ</button>
-              <button class="settings-item" data-theme="dark" role="menuitem">ダークテーマ</button>
-              <button class="settings-item" data-theme="auto" role="menuitem">テーマ自動 (OS)</button>
+              <!-- テーマ変更 親トグル -->
+              <button id="themeToggle" class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between" role="menuitem" aria-expanded="false">
+                <span>テーマ変更</span>
+                <span class="chevron">▸</span>
+              </button>
+              <!-- サブメニュー: テーマ選択 -->
+              <div id="themeSubmenu" class="ml-3 mt-1 hidden" role="group" aria-label="テーマ選択">
+                <button class="settings-item w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" data-theme="light" role="menuitem">ライトテーマ</button>
+                <button class="settings-item w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" data-theme="dark" role="menuitem">ダークテーマ</button>
+                <button class="settings-item w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" data-theme="auto" role="menuitem">テーマ自動 (OS)</button>
+              </div>
+
+              <hr class="my-1 border-gray-200 dark:border-gray-700" />
+
+              <!-- エクスプローラで開く -->
+              <button id="openInExplorer" class="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">エクスプローラで開く</button>
             </div>
           </div>
+
           <button id="minimizeBtn" class="window-btn hover:bg-gray-200 p-1   rounded-lg" aria-label="最小化">
             <svg width="20" height="20" viewBox="0 1 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 7h8v1H2V7z" fill="currentColor"/>
@@ -66,8 +80,8 @@
 
 
       <footer class="flex items-center justify-between text-sm text-gray-600 shrink-0 px-2">
-        <p class=" text-gray-400">VirtualDesktopImager エーテル製</p>
         <p id="status" class="text-center text-sm text-gray-600 m-0"></p>
+        <p id="zoomDisplay" class="text-center text-sm text-gray-600 m-0">100%</p>
       </footer>
     </main>
   </body>

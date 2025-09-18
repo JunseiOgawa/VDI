@@ -214,6 +214,7 @@ footer p {
   text-overflow: ellipsis; /* 長すぎる文字は省略記号で表示 */
 }
 
+
 /* 画面幅600px以上の場合：画面の1/5幅で表示 */
 @media (min-width: 600px) {
   .nav-left {
@@ -307,3 +308,93 @@ footer p {
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
 }
+
+/* ========================= 連結ズームボタングループ ========================= */
+/* 親コンテナのギャップを0にして3ボタンを密着させる */
+.custom-titlebar .flex.items-center.mr-auto {
+  gap: 0; /* Tailwindのgap-2を上書き */
+}
+
+/* ズームグループの直後にある「画面フィット」には余白を戻す */
+.custom-titlebar #screenFitBtn {
+  margin-left: 8px;
+}
+
+/* ベーススタイル（3ボタン共通） */
+.custom-titlebar #zoomOutBtn,
+.custom-titlebar #zoomResetBtn,
+.custom-titlebar #zoomInBtn {
+  -webkit-app-region: no-drag;
+  /* 外観 */
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-secondary);
+  border-radius: 0;
+  height: 28px;
+  padding: 0 10px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* リセットボタンのアイコンとテキスト間 */
+  box-shadow: inset 0 1px 2px var(--shadow);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+/* 左端（−）ボタン：左角のみ角丸、右側の線はつなぎ目を1本にするため隠す */
+.custom-titlebar #zoomOutBtn {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-right-color: transparent;
+}
+
+/* 中央（100%）ボタン：角丸なし、両端の線は外周側のみ見えるよう調整 */
+.custom-titlebar #zoomResetBtn {
+  min-width: 72px; /* 視認性のため中央は少し広く */
+  background-color: var(--bg-secondary); /* サンプルに合わせ中央だけ少し色味を変える */
+  border-left-color: var(--border-secondary); /* 左の外周線 */
+  border-right-color: transparent;            /* 右はつなぎ目を1本に */
+}
+
+/* 右端（＋）ボタン：右角のみ角丸 */
+.custom-titlebar #zoomInBtn {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* ホバー時のフィードバック */
+.custom-titlebar #zoomOutBtn:hover,
+.custom-titlebar #zoomInBtn:hover {
+  /* color-mix対応ブラウザでわずかに明るく。非対応でも下のfallbackで概ね良好 */
+  background-color: color-mix(in srgb, var(--bg-tertiary), white 10%);
+}
+
+/* color-mix未対応向けのフォールバック（上書きされないブラウザではこちらが効く） */
+@supports not (background-color: color-mix(in srgb, black, white)) {
+  .custom-titlebar #zoomOutBtn:hover,
+  .custom-titlebar #zoomInBtn:hover {
+    background-color: var(--bg-secondary);
+  }
+}
+
+/* 中央ボタンはホバーで周囲と同化させる */
+.custom-titlebar #zoomResetBtn:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* アクティブ時（押下時）は浮き上がりを戻す */
+.custom-titlebar #zoomOutBtn:active,
+.custom-titlebar #zoomResetBtn:active,
+.custom-titlebar #zoomInBtn:active {
+  transform: translateY(0);
+  box-shadow: inset 0 1px 3px var(--shadow);
+}
+
+/* フォーカス可視化（アクセシビリティ） */
+.custom-titlebar #zoomOutBtn:focus-visible,
+.custom-titlebar #zoomResetBtn:focus-visible,
+.custom-titlebar #zoomInBtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary) inset;
+}
+

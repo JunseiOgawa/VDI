@@ -1,13 +1,20 @@
 export class StatusDisplay {
   private statusElement: HTMLParagraphElement | null = null;
+  private zoomDisplayElement: HTMLParagraphElement | null = null;
 
   setStatusElement(element: HTMLParagraphElement): void {
     this.statusElement = element;
   }
 
+  setZoomDisplayElement(element: HTMLParagraphElement): void {
+    this.zoomDisplayElement = element;
+  }
+
   showImagePath(path: string): void {
     if (this.statusElement) {
-      this.statusElement.textContent = `表示中の画像パス: ${path}`;
+      // フォルダパスは除外し、ファイル名のみを表示
+      const fileName = path.replace(/\\/g, '/').split('/').pop() || path;
+      this.statusElement.textContent = fileName;
     }
   }
 
@@ -36,13 +43,11 @@ export class StatusDisplay {
   }
 
   updateZoomInfo(scale: number): void {
-    if (this.statusElement) {
-      const percentage = Math.round(scale * 100);
-      const currentText = this.statusElement.textContent || '';
-      
-      // 既存のズーム情報を削除して新しい情報を追加
-      const baseText = currentText.replace(/ \(ズーム: \d+%\)/, '');
-      this.statusElement.textContent = `${baseText} (ズーム: ${percentage}%)`;
+    const percentage = Math.round(scale * 100);
+    
+    // 専用のzoom表示要素がある場合はそちらを更新
+    if (this.zoomDisplayElement) {
+      this.zoomDisplayElement.textContent = `${percentage}%`;
     }
   }
 }

@@ -29,6 +29,8 @@ class VDIApp {
   private viewerEl: HTMLImageElement | null = null;
   // ステータスを表示するHTML要素への参照
   private statusEl: HTMLParagraphElement | null = null;
+  // ズーム倍率を表示するHTML要素への参照
+  private zoomDisplayEl: HTMLParagraphElement | null = null;
 
   constructor() {
     // ズームコントローラーのインスタンス作成 
@@ -73,6 +75,8 @@ class VDIApp {
     this.viewerEl = DOMHelper.querySelector<HTMLImageElement>(SELECTORS.viewer);
     // ステータス表示用のp要素を取得 (SELECTORS.statusで定義されたセレクター使用)
     this.statusEl = DOMHelper.querySelector<HTMLParagraphElement>(SELECTORS.status);
+  // ズーム倍率表示用の要素を取得
+  this.zoomDisplayEl = DOMHelper.querySelector<HTMLParagraphElement>(SELECTORS.zoomDisplay);
 
     if (this.viewerEl) {
       // ズームコントローラーに画像要素を設定
@@ -101,6 +105,11 @@ class VDIApp {
     if (this.statusEl) {
       // ステータス表示にステータス要素を設定
       this.statusDisplay.setStatusElement(this.statusEl);
+    }
+
+    if (this.zoomDisplayEl) {
+      // ズーム倍率表示にズーム表示要素を設定
+      this.statusDisplay.setZoomDisplayElement(this.zoomDisplayEl);
     }
   }
 
@@ -353,7 +362,22 @@ class VDIApp {
       isOpen ? (closeMenu(), isOpen = false) : (openMenu(), isOpen = true);
     });
 
-    // メニュー項目クリックでテーマ変更
+    // サブメニュー開閉（テーマ変更）
+    const themeToggle = settingsMenu.querySelector<HTMLButtonElement>('#themeToggle');
+    const themeSubmenu = settingsMenu.querySelector<HTMLDivElement>('#themeSubmenu');
+    themeToggle?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const expanded = themeToggle.getAttribute('aria-expanded') === 'true';
+      const now = !expanded;
+      themeToggle.setAttribute('aria-expanded', String(now));
+      themeToggle.querySelector('.chevron')?.replaceWith(Object.assign(document.createElement('span'), { className: 'chevron', textContent: now ? '▾' : '▸' }));
+      if (themeSubmenu) {
+        if (now) themeSubmenu.classList.remove('hidden');
+        else themeSubmenu.classList.add('hidden');
+      }
+    });
+
+    // テーマ選択
     settingsMenu.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       const item = target.closest<HTMLButtonElement>('.settings-item');
@@ -361,8 +385,22 @@ class VDIApp {
       const value = item.dataset.theme as 'light' | 'dark' | 'auto' | undefined;
       if (!value) return;
       this.themeManager.setTheme(value);
-      closeMenu();
-      isOpen = false;
+      // メニューは閉じずにそのまま（ユーザーが他の設定を続けられるように）
+    });
+
+    // エクスプローラで開く
+    const openInExplorerBtn = settingsMenu.querySelector<HTMLButtonElement>('#openInExplorer');
+    openInExplorerBtn?.addEventListener('click', async () => {
+      try {
+        const currentPath = this.imageLoader.getCurrentImagePath();
+        if (!currentPath) return;
+        const { revealItemInDir } = await import('@tauri-apps/plugin-opener');
+        await revealItemInDir(currentPath);
+        closeMenu();
+        isOpen = false;
+      } catch (err) {
+        console.error('エクスプローラで開くに失敗:', err);
+      }
     });
 
     // 外側クリックで閉じる

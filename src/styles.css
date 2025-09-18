@@ -47,18 +47,46 @@ html, body, #app-root {
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
 
-/* ナビゲーション矢印要素 */
+/* ナビゲーション矢印要素 - 共通スタイル */
 .nav-arrow {
   position: absolute;
   top: 0;
   bottom: 0;
   cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+  opacity: 0; /* デフォルトで非表示 */
+  transition: opacity 0.3s ease;
   z-index: 10;
 }
 
-.nav-arrow:hover {
+/* 左ナビゲーション要素 */
+.nav-left {
+  opacity: 0; /* デフォルトで非表示 */
+  transition: opacity 0.3s ease;
+}
+
+.nav-left:hover {
+  opacity: 1; /* 左ナビゲーション要素自体にホバーした時 */
+}
+
+/* 右ナビゲーション要素 */
+.nav-right {
+  opacity: 0; /* デフォルトで非表示 */
+  transition: opacity 0.3s ease;
+}
+
+.nav-right:hover {
+  opacity: 1; /* 右ナビゲーション要素自体にホバーした時 */
+}
+
+
+
+#viewerContainer:hover .nav-left:hover {
+  opacity: 1;
+}
+
+
+
+#viewerContainer:hover .nav-right:hover {
   opacity: 1;
 }
 
@@ -97,6 +125,18 @@ html, body, #app-root {
   border-right: 3px solid rgba(255, 255, 255, 0.8);
   border-bottom: 3px solid rgba(255, 255, 255, 0.8);
   transform: translate(50%, -50%) rotate(-45deg);
+}
+
+/* フッター要素の改行制限 */
+footer {
+  white-space: nowrap; /* 改行を防ぐ */
+  overflow: hidden; /* はみ出し部分を隠す */
+}
+
+footer p {
+  white-space: nowrap; /* フッター内のpタグも改行を防ぐ */
+  overflow: hidden; /* はみ出し部分を隠す */
+  text-overflow: ellipsis; /* 長すぎる文字は省略記号で表示 */
 }
 
 /* 画面幅600px以上の場合：画面の1/5幅で表示 */

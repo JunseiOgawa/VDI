@@ -10,35 +10,31 @@
   <body class="min-h-dvh bg-gray-50 text-gray-900">
   <main class="h-dvh flex flex-col w-full">
       <!-- カスタムタイトルバー -->
-      <div class="custom-titlebar flex items-center justify-end bg-gray-100 px-2 py-1 border-b border-gray-300">
+      <div class="custom-titlebar flex items-center justify-end bg-gray-100 px-2 py-5 border-b border-gray-300">
+        <div class="flex items-center gap-2 mr-auto">
+          <button id="zoomOutBtn" class="btn btn-outline px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="縮小 (−)">−</button>
+          <button id="zoomResetBtn" class="btn btn-outline px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="リセット">100%</button>
+          <button id="zoomInBtn" class="btn btn-primary px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700" aria-label="拡大 (+)">＋</button>
+          <button id="screenFitBtn" class="btn btn-outline px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" aria-label="画面フィット">画面フィット</button>
+        </div>
         <div class="flex items-center">
-          <button id="minimizeBtn" class="window-btn hover:bg-gray-200 p-1 rounded" aria-label="最小化">
+          <button id="minimizeBtn" class="window-btn hover:bg-gray-200 p-1 rounded-lg" aria-label="最小化">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 7h8v1H2V7z" fill="currentColor"/>
             </svg>
           </button>
-          <button id="maximizeBtn" class="window-btn hover:bg-gray-200 p-1 rounded" aria-label="最大化">
+          <button id="maximizeBtn" class="window-btn hover:bg-gray-200 p-1 rounded-lg" aria-label="最大化">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2 2v8h8V2H2zm1 1h6v6H3V3z" fill="currentColor"/>
             </svg>
           </button>
-          <button id="closeBtn" class="window-btn hover:bg-red-500 hover:text-white p-1 rounded" aria-label="閉じる">
+          <button id="closeBtn" class="window-btn hover:bg-red-500 hover:text-white p-1 rounded-lg" aria-label="閉じる">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
             </svg>
           </button>
         </div>
       </div>
-      
-      <header class="flex items-center justify-between shrink-0 p-2">
-        <div></div>
-        <div class="flex items-center gap-2">
-          <button id="zoomOutBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="縮小 (−)">−</button>
-          <button id="zoomResetBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="リセット">100%</button>
-          <button id="zoomInBtn" class="btn btn-primary px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700" aria-label="拡大 (+)">＋</button>
-          <button id="screenFitBtn" class="btn btn-outline px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-100" aria-label="画面フィット">画面フィット</button>
-        </div>
-      </header>
 
 
       <section id="viewerContainer" class="relative viewer-bg rounded-lg border border-gray-200 flex-1 min-h-0 w-full select-none overflow-auto">

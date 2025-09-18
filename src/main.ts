@@ -289,9 +289,9 @@ class VDIApp {
 
     // ギアアイコンを小さくして currentColor を反映（stroke 色を currentColor に）
     const gear = settingIconSvg
-      .replace('width="48"', 'width="16"')
-      .replace('height="48"', 'height="16"')
-      .replace('<svg ', '<svg class="theme-icon" ')
+      .replace('width="1"', 'width="20"')
+      .replace('height="1"', 'height="20"')
+      .replace('<svg ', '<svg class="theme-icon" width="20" height="20" aria-hidden="true" focusable="false" ')
       // style定義を除去
       .replace(/<defs>[\s\S]*?<\/defs>/, '')
       // クラスベース指定を直接属性へ変換して currentColor を適用

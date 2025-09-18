@@ -93,9 +93,11 @@ export class ImageLoader {
     try {
       const path = await invoke<string | null>('get_launch_image_path');
       
+      console.log('Received path from Rust:', path);
+      
       if (path && path.length > 0) {
-        // パスの正規化とエスケープ処理
-        const normalizedPath = path.replace(/\\\\/g, '/');
+        // Windowsパスの正規化（バックスラッシュをスラッシュに変換）
+        const normalizedPath = path.replace(/\\/g, '/');
         const url = convertFileSrc(normalizedPath);
         
         console.log('Original path:', path);
@@ -110,6 +112,8 @@ export class ImageLoader {
         // 現在の画像パスを記録
         this.currentImagePath = path;
         return path;
+      } else {
+        console.log('No path received from Rust backend');
       }
       return null;
     } catch (error) {

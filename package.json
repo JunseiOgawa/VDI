@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"vite\" \"npx tauri dev\"",
+    "dev:with-image": "npx tauri dev",
     "build": "tauri build",
     "preview": "vite preview",
     "tauri": "tauri",

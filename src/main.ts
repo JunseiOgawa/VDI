@@ -1,6 +1,7 @@
 import { DOMHelper } from './features/utils';
 import { ZoomController, ZoomEventHandler } from './features/zoom';
 import { ImageLoader, StatusDisplay } from './features/imageViewer';
+import { ThemeManager } from './features/theme';
 import { SELECTORS } from './config';
 
 // ユーティリティ: DOM操作のヘルパー関数 (src/features/utils/DOMHelper.ts)
@@ -17,6 +18,8 @@ class VDIApp {
   private imageLoader: ImageLoader;
   // ステータス表示を管理するクラス (src/features/imageViewer/StatusDisplay.ts)
   private statusDisplay: StatusDisplay;
+  // テーマ管理を担当するクラス (src/features/theme/ThemeManager.ts)
+  private themeManager: ThemeManager;
 
   // 画像を表示するHTML要素への参照
   private viewerEl: HTMLImageElement | null = null;
@@ -32,16 +35,24 @@ class VDIApp {
     this.imageLoader = new ImageLoader();
     // ステータス表示のインスタンス作成
     this.statusDisplay = new StatusDisplay();
+    // テーママネージャーのインスタンス作成（LocalStorageから設定読み込み）
+    this.themeManager = new ThemeManager();
   }
 
   /**
    * アプリケーションの初期化処理
    * 1. DOM要素のセットアップ
-   * 2. イベントリスナーのセットアップ  
-   * 3. 初期画像の読み込み
+   * 2. テーマシステムの初期化（OSテーマ取得）
+   * 3. イベントリスナーのセットアップ  
+   * 4. 初期画像の読み込み
    */
   async initialize(): Promise<void> {
     this.setupElements();
+    
+    // テーママネージャーを初期化（OSテーマ自動取得）
+    await this.themeManager.initialize();
+    this.setupThemeUI();
+    
     this.setupEventListeners();
     await this.loadInitialImage();
   }
@@ -224,6 +235,90 @@ class VDIApp {
    */
   getFolderNavigationEnabled(): boolean {
     return this.imageLoader.getFolderNavigationEnabled();
+  }
+
+  /**
+   * テーマ切り替えUIのセットアップ
+   * カスタムタイトルバーにテーマ切り替えボタンを追加
+   */
+  private setupThemeUI(): void {
+    const titlebar = document.querySelector('.custom-titlebar');
+    if (!titlebar) {
+      console.warn('[VDIApp] カスタムタイトルバーが見つかりません');
+      return;
+    }
+
+    // テーマ切り替えボタンを作成
+    const themeButton = document.createElement('button');
+    themeButton.className = 'window-btn theme-toggle-btn';
+    themeButton.title = 'テーマを切り替え (Light/Dark)';
+    themeButton.setAttribute('aria-label', 'テーマ切り替え');
+    
+    // 初期アイコンを設定
+    this.updateThemeButtonIcon(themeButton);
+    
+    // クリックイベントを設定
+    themeButton.addEventListener('click', () => {
+      // アニメーション効果を追加
+      themeButton.classList.add('switching');
+      
+      // テーマを切り替え
+      this.themeManager.toggleTheme();
+      
+      // アイコンを更新
+      setTimeout(() => {
+        this.updateThemeButtonIcon(themeButton);
+        themeButton.classList.remove('switching');
+      }, 150);
+    });
+
+    // ウィンドウ制御ボタンの前に挿入（最小化ボタンを探す）
+    const minimizeBtn = titlebar.querySelector('#minimizeBtn');
+    
+    if (minimizeBtn) {
+      minimizeBtn.parentElement?.insertBefore(themeButton, minimizeBtn);
+      console.log('[VDIApp] テーマ切り替えボタンを最小化ボタンの前に追加しました');
+    } else {
+      // フォールバック: ウィンドウボタンコンテナの最初に追加
+      const windowButtonContainer = titlebar.querySelector('.flex.items-center:last-child');
+      if (windowButtonContainer) {
+        windowButtonContainer.insertBefore(themeButton, windowButtonContainer.firstChild);
+        console.log('[VDIApp] テーマ切り替えボタンをウィンドウボタンコンテナの最初に追加しました');
+      } else {
+        titlebar.appendChild(themeButton);
+        console.log('[VDIApp] テーマ切り替えボタンをタイトルバー末尾に追加しました');
+      }
+    }
+
+    // テーマ変更イベントをリッスン
+    document.addEventListener('themeChanged', (event: Event) => {
+      const customEvent = event as CustomEvent;
+      this.updateThemeButtonIcon(themeButton);
+      console.log(`[VDIApp] テーマが変更されました: ${customEvent.detail?.theme} (ユーザー設定: ${customEvent.detail?.userTheme})`);
+    });
+  }
+
+  /**
+   * テーマ切り替えボタンのアイコンを更新
+   * @param button テーマ切り替えボタン要素
+   */
+  private updateThemeButtonIcon(button: HTMLButtonElement): void {
+    const currentAppliedTheme = this.themeManager.getAppliedTheme();
+    const userTheme = this.themeManager.getCurrentTheme();
+    
+    // アイコンの選択：現在適用されているテーマに基づく
+    if (currentAppliedTheme === 'dark') {
+      button.innerHTML = '☀️'; // ダークモード時は太陽（ライトモードに切り替え可能）
+      button.title = 'ライトモードに切り替え';
+    } else {
+      button.innerHTML = '🌙'; // ライトモード時は月（ダークモードに切り替え可能）
+      button.title = 'ダークモードに切り替え';
+    }
+    
+    // autoモードの場合はタイトルに追記
+    if (userTheme === 'auto') {
+      button.title += ' (自動)';
+    }
   }
 }
 

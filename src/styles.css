@@ -1,10 +1,62 @@
 @import "tailwindcss";
 
-/* アプリ全体のベースレイアウト調整 */
+/* ========================= テーマ設定 (CSS Custom Properties) ========================= */
+:root {
+  /* ライトテーマ（デフォルト）の色定義 */
+  --bg-primary: #ffffff;           /* メイン背景色 */
+  --bg-secondary: #f8fafc;         /* セカンダリ背景色（タイトルバーなど） */
+  --bg-tertiary: #f1f5f9;          /* 第三背景色 */
+  --text-primary: #0f172a;         /* メインテキスト色 */
+  --text-secondary: #475569;       /* セカンダリテキスト色 */
+  --text-muted: #94a3b8;           /* ミュートテキスト色 */
+  --border-primary: #e2e8f0;       /* メインボーダー色 */
+  --border-secondary: #cbd5e1;     /* セカンダリボーダー色 */
+  --accent-primary: #3b82f6;       /* アクセント色（青） */
+  --accent-hover: #2563eb;         /* アクセントホバー色 */
+  --shadow: rgba(0, 0, 0, 0.1);    /* シャドウ色 */
+  
+  /* ビューワー固有の色設定 */
+  --viewer-bg-pattern: #f3f4f6;    /* チェッカーボード背景色 */
+  --viewer-overlay: rgba(0, 0, 0, 0.1);          /* オーバーレイ色 */
+  --nav-arrow-bg: rgba(255, 255, 255, 0.8);      /* ナビ矢印背景 */
+  --nav-arrow-border: rgba(255, 255, 255, 0.8);  /* ナビ矢印ボーダー */
+  --nav-arrow-icon: rgba(255, 255, 255, 0.8);    /* ナビ矢印アイコン色 */
+}
+
+/* ダークテーマの色定義 */
+[data-theme="dark"] {
+  --bg-primary: #0f172a;           /* メイン背景色（濃い青グレー） */
+  --bg-secondary: #1e293b;         /* セカンダリ背景色 */
+  --bg-tertiary: #334155;          /* 第三背景色 */
+  --text-primary: #f8fafc;         /* メインテキスト色（ほぼ白） */
+  --text-secondary: #cbd5e1;       /* セカンダリテキスト色 */
+  --text-muted: #64748b;           /* ミュートテキスト色 */
+  --border-primary: #334155;       /* メインボーダー色 */
+  --border-secondary: #475569;     /* セカンダリボーダー色 */
+  --accent-primary: #60a5fa;       /* アクセント色（明るい青） */
+  --accent-hover: #3b82f6;         /* アクセントホバー色 */
+  --shadow: rgba(0, 0, 0, 0.3);    /* シャドウ色（濃く） */
+  
+  /* ビューワー固有の色設定（ダーク用） */
+  --viewer-bg-pattern: #374151;    /* チェッカーボード背景色（ダーク） */
+  --viewer-overlay: rgba(255, 255, 255, 0.1);    /* オーバーレイ色（反転） */
+  --nav-arrow-bg: rgba(0, 0, 0, 0.8);            /* ナビ矢印背景（ダーク） */
+  --nav-arrow-border: rgba(255, 255, 255, 0.6);  /* ナビ矢印ボーダー */
+  --nav-arrow-icon: rgba(255, 255, 255, 0.8);    /* ナビ矢印アイコン色 */
+}
+
+
+
+/* ========================= アプリ全体のベースレイアウト調整 ========================= */
 html, body, #app-root {
   height: 100%;
   overflow-x: hidden; /* 横スクロールは禁止 */
   overflow-y: auto;   /* 縦は必要に応じてスクロール（ズーム操作はviewer側でpreventDefault） */
+  
+  /* テーマ変数を適用 */
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease; /* テーマ切り替え時のスムーズな遷移 */
 }
 
 /* ビューワーコンテナ内でのスクロールは許可（ズーム操作用） */
@@ -25,6 +77,12 @@ html, body, #app-root {
   -webkit-app-region: drag;
   user-select: none;
   height: 32px;
+  
+  /* テーマ対応 */
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .window-btn {
@@ -35,16 +93,27 @@ html, body, #app-root {
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  /* テーマ対応 */
+  color: var(--text-secondary);
+  border-radius: 4px;
 }
 
-/* 画像コンテナの背景など */
+.window-btn:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* 画像コンテナの背景（透明部分を表示するチェッカーボード） */
 .viewer-bg {
-  background-image: linear-gradient(45deg, #f3f4f6 25%, transparent 25%),
-    linear-gradient(-45deg, #f3f4f6 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #f3f4f6 75%),
-    linear-gradient(-45deg, transparent 75%, #f3f4f6 75%);
+  background-image: 
+    linear-gradient(45deg, var(--viewer-bg-pattern) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--viewer-bg-pattern) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--viewer-bg-pattern) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--viewer-bg-pattern) 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  transition: background-image 0.3s ease; /* テーマ切り替え時の遷移 */
 }
 
 /* ナビゲーション矢印要素 - 共通スタイル */
@@ -97,24 +166,24 @@ html, body, #app-root {
   transform: translateY(-50%);
   width: 24px;
   height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid var(--nav-arrow-border);
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--nav-arrow-bg);
   backdrop-filter: blur(4px);
   transition: all 0.2s ease;
 }
 
 .nav-arrow:hover::before {
-  background: rgba(0, 0, 0, 0.2);
-  border-color: rgba(255, 255, 255, 1);
+  background: var(--viewer-overlay);
+  border-color: var(--nav-arrow-icon);
 }
 
 /* 左矢印 */
 .nav-left::before {
   left: 50%;
   transform: translate(-50%, -50%);
-  border-right: 3px solid rgba(255, 255, 255, 0.8);
-  border-bottom: 3px solid rgba(255, 255, 255, 0.8);
+  border-right: 3px solid var(--nav-arrow-icon);
+  border-bottom: 3px solid var(--nav-arrow-icon);
   transform: translate(-50%, -50%) rotate(135deg);
 }
 
@@ -122,8 +191,8 @@ html, body, #app-root {
 .nav-right::before {
   right: 50%;
   transform: translate(50%, -50%);
-  border-right: 3px solid rgba(255, 255, 255, 0.8);
-  border-bottom: 3px solid rgba(255, 255, 255, 0.8);
+  border-right: 3px solid var(--nav-arrow-icon);
+  border-bottom: 3px solid var(--nav-arrow-icon);
   transform: translate(50%, -50%) rotate(-45deg);
 }
 
@@ -131,6 +200,12 @@ html, body, #app-root {
 footer {
   white-space: nowrap; /* 改行を防ぐ */
   overflow: hidden; /* はみ出し部分を隠す */
+  
+  /* テーマ対応 */
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-primary);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 footer p {
@@ -163,4 +238,31 @@ footer p {
     right: 0;
     width: 80px;
   }
+}
+
+/* ========================= テーマ切り替えボタン ========================= */
+.theme-toggle-btn {
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.1);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+/* テーマ切り替えアニメーション */
+.theme-toggle-btn.switching {
+  animation: themeSwitch 0.3s ease-in-out;
+}
+
+@keyframes themeSwitch {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); }
 }

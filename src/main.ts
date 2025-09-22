@@ -1,8 +1,8 @@
 import { DOMHelper } from './features/utils';
 import { ZoomController, ZoomEventHandler } from './features/zoom';
+import { RotateController } from './features/rotate';
 import { ImageLoader, StatusDisplay } from './features/imageViewer';
 import { ThemeManager } from './features/theme';
-import { RotateController } from './features/rotate';
 import { SELECTORS } from './config';
 // 旧: sun/moon アイコンは設定メニュー移行により未使用
 import settingIconSvg from './asset/setting_ge_h.svg?raw';
@@ -25,7 +25,7 @@ class VDIApp {
   private statusDisplay: StatusDisplay;
   // テーマ管理を担当するクラス (src/features/theme/ThemeManager.ts)
   private themeManager: ThemeManager;
-  // 回転機能を管理するコントローラー (src/features/rotate/RotateController.ts)
+  // 回転を担当するコントローラー
   private rotateController: RotateController;
 
   // 画像を表示するHTML要素への参照
@@ -88,6 +88,10 @@ class VDIApp {
       this.zoomController.setViewerElement(this.viewerEl);
       // 回転コントローラーに画像要素を設定
       this.rotateController.setViewerElement(this.viewerEl);
+      // 回転コントローラーにズームコントローラーを設定（回転後の自動フィット用）
+      this.rotateController.setZoomController(this.zoomController);
+      // 回転コントローラーにImageLoaderを設定（現在の画像パス取得用）
+      this.rotateController.setImageLoader(this.imageLoader);
       // ズーム倍率の変更をフッターに反映する
       this.zoomController.setOnScaleChange((scale) => {
         if (this.statusEl) {

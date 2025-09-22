@@ -1,9 +1,99 @@
 use tauri::Manager;
+use image::ImageFormat;
+use std::path::Path;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
+// 画像ファイルのバックアップを作成するコマンド
+#[tauri::command]
+async fn create_image_backup(image_path: String) -> Result<String, String> {
+    let path = std::path::Path::new(&image_path);
+    
+    if !path.exists() {
+        return Err("指定されたファイルが存在しません".to_string());
+    }
+    
+    // バックアップファイル名を生成
+    let backup_path = format!("{}.backup", image_path);
+    
+    // ファイルをコピーしてバックアップ作成
+    std::fs::copy(&image_path, &backup_path)
+        .map_err(|e| format!("バックアップ作成に失敗しました: {}", e))?;
+    
+    Ok(backup_path)
+}
+
+// バックアップから画像を復元するコマンド
+#[tauri::command]
+async fn restore_image_from_backup(image_path: String) -> Result<String, String> {
+    let backup_path = format!("{}.backup", image_path);
+    let backup = std::path::Path::new(&backup_path);
+    
+    if !backup.exists() {
+        return Err("バックアップファイルが存在しません".to_string());
+    }
+    
+    // バックアップから元ファイルを復元
+    std::fs::copy(&backup_path, &image_path)
+        .map_err(|e| format!("画像復元に失敗しました: {}", e))?;
+    
+    // バックアップファイルを削除
+    std::fs::remove_file(&backup_path)
+        .map_err(|e| format!("バックアップファイル削除に失敗しました: {}", e))?;
+    
+    Ok(image_path)
+}
+
+// バックアップファイルを削除するコマンド
+#[tauri::command]
+async fn cleanup_image_backup(image_path: String) -> Result<(), String> {
+    let backup_path = format!("{}.backup", image_path);
+    let backup = std::path::Path::new(&backup_path);
+    
+    if backup.exists() {
+        std::fs::remove_file(&backup_path)
+            .map_err(|e| format!("バックアップファイル削除に失敗しました: {}", e))?;
+    }
+    
+    Ok(())
+}
+
+// 画像を回転させるコマンド（元ファイルを置き換え）
+#[tauri::command]
+async fn rotate_image(image_path: String, rotation_angle: f32) -> Result<String, String> {
+    let path = Path::new(&image_path);
+    
+    // パスの検証
+    if !path.exists() {
+        return Err("指定されたファイルが存在しません".to_string());
+    }
+    
+    // 画像を読み込み
+    let img = image::open(path)
+        .map_err(|e| format!("画像の読み込みに失敗しました: {}", e))?;
+    
+    // 回転処理（90度単位での回転を想定）
+    let rotated_img = match rotation_angle as i32 % 360 {
+        90 => img.rotate90(),
+        180 => img.rotate180(),
+        270 => img.rotate270(),
+        _ => img, // 0度または無効な角度の場合はそのまま
+    };
+    
+    // 元の画像形式を推測
+    let format = image::ImageFormat::from_path(path)
+        .unwrap_or(ImageFormat::Png);
+    
+    // 元のファイルを直接上書き
+    rotated_img.save_with_format(&image_path, format)
+        .map_err(|e| format!("回転した画像の保存に失敗しました: {}", e))?;
+    
+    // 元のパスをそのまま返す
+    Ok(image_path)
 }
 
 
@@ -204,7 +294,7 @@ pub fn run() {
     
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet, get_launch_image_path, get_launch_window_mode, get_folder_images, get_next_image, get_previous_image, get_system_theme])
+        .invoke_handler(tauri::generate_handler![greet, get_launch_image_path, get_launch_window_mode, get_folder_images, get_next_image, get_previous_image, get_system_theme, rotate_image, create_image_backup, restore_image_from_backup, cleanup_image_backup])
         .setup(move |app| {
             // ウィンドウサイズに応じて設定を変更
             if let Some(mode) = &window_mode {

@@ -122,11 +122,18 @@ export class ImageLoader {
     }
   }
 
-  async loadImageFromPath(imagePath: string): Promise<boolean> {
+  async loadImageFromPath(imagePath: string, forceReload: boolean = false): Promise<boolean> {
     try {
       // パスの正規化とエスケープ処理
       const normalizedPath = imagePath.replace(/\\\\/g, '/');
-      const url = convertFileSrc(normalizedPath);
+      let url = convertFileSrc(normalizedPath);
+      
+      // forceReloadが有効な場合、キャッシュバスターを追加
+      if (forceReload) {
+        const timestamp = new Date().getTime();
+        const separator = url.includes('?') ? '&' : '?';
+        url += `${separator}t=${timestamp}`;
+      }
       
       if (this.viewerElement) {
         this.setupImageLoadHandler();

@@ -2,6 +2,7 @@ import { DOMHelper } from './features/utils';
 import { ZoomController, ZoomEventHandler } from './features/zoom';
 import { ImageLoader, StatusDisplay } from './features/imageViewer';
 import { ThemeManager } from './features/theme';
+import { RotateController } from './features/rotate';
 import { SELECTORS } from './config';
 // 旧: sun/moon アイコンは設定メニュー移行により未使用
 import settingIconSvg from './asset/setting_ge_h.svg?raw';
@@ -24,6 +25,8 @@ class VDIApp {
   private statusDisplay: StatusDisplay;
   // テーマ管理を担当するクラス (src/features/theme/ThemeManager.ts)
   private themeManager: ThemeManager;
+  // 回転機能を管理するコントローラー (src/features/rotate/RotateController.ts)
+  private rotateController: RotateController;
 
   // 画像を表示するHTML要素への参照
   private viewerEl: HTMLImageElement | null = null;
@@ -43,6 +46,8 @@ class VDIApp {
     this.statusDisplay = new StatusDisplay();
     // テーママネージャーのインスタンス作成（LocalStorageから設定読み込み）
     this.themeManager = new ThemeManager();
+    // 回転コントローラーのインスタンス作成
+    this.rotateController = new RotateController();
   }
 
   /**
@@ -81,6 +86,8 @@ class VDIApp {
     if (this.viewerEl) {
       // ズームコントローラーに画像要素を設定
       this.zoomController.setViewerElement(this.viewerEl);
+      // 回転コントローラーに画像要素を設定
+      this.rotateController.setViewerElement(this.viewerEl);
       // ズーム倍率の変更をフッターに反映する
       this.zoomController.setOnScaleChange((scale) => {
         if (this.statusEl) {
@@ -122,6 +129,7 @@ class VDIApp {
     this.setupWindowControls();
     this.setupNavigationControls();
     this.setupSettingsUI();
+    this.setupRotateControls();
     // ウィンドウのリサイズ時、画面フィットが有効なら常に再フィット
     window.addEventListener('resize', () => this.zoomController.refitIfActive());
   }
@@ -211,6 +219,17 @@ class VDIApp {
           console.error('次の写真への移動に失敗しました:', error);
         }
       });
+    }
+  }
+
+  /**
+   * 回転ボタンの設定
+   */
+  private setupRotateControls(): void {
+    const rotateBtn = DOMHelper.querySelector<HTMLButtonElement>(SELECTORS.rotateBtn);
+
+    if (rotateBtn) {
+      rotateBtn.addEventListener('click', () => this.rotateController.rotate());
     }
   }
 

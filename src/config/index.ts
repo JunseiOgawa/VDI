@@ -23,6 +23,7 @@ export const SELECTORS = {
   zoomOutBtn: '#zoomOutBtn',
   zoomResetBtn: '#zoomResetBtn',
   screenFitBtn: '#screenFitBtn',
+  rotateBtn: '#rotateBtn',
   minimizeBtn: '#minimizeBtn',
   maximizeBtn: '#maximizeBtn',
   closeBtn: '#closeBtn',

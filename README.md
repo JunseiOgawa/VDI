@@ -52,5 +52,5 @@ VDI.exe image.png 1280x720
 
 ### 起動時に引数を渡すには
 ```bash
-npm run dev:with-image -- "D:\!VRCスクショ\2025-08\VRChat_2025-08-02_23-19-26.068_3840x2160.png"
+npm run dev:with-image -- "D:\3840x2160.png"
 ```

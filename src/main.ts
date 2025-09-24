@@ -108,6 +108,9 @@ class VDIApp {
           const currentPath = this.imageLoader.getCurrentImagePath();
           if (currentPath) {
             this.statusDisplay.showImagePath(currentPath);
+            
+            // 画像切り替え時：処理完了した回転があるかチェック
+            this.checkAndApplyCompletedRotation(currentPath);
           }
         }
       });
@@ -134,6 +137,7 @@ class VDIApp {
     this.setupNavigationControls();
     this.setupSettingsUI();
     this.setupRotateControls();
+    this.setupTitlebarDragControls();
     // ウィンドウのリサイズ時、画面フィットが有効なら常に再フィット
     window.addEventListener('resize', () => this.zoomController.refitIfActive());
   }
@@ -238,6 +242,80 @@ class VDIApp {
   }
 
   /**
+   * タイトルバーのドラッグ制御設定
+   * ボタン類ではドラッグでのウィンドウ移動を無効化し、適切なクリック動作を保持
+   */
+  private setupTitlebarDragControls(): void {
+    const titlebar = document.querySelector('.custom-titlebar');
+    if (!titlebar) return;
+
+    // ボタン類を取得
+    const buttons = titlebar.querySelectorAll('button');
+    
+    buttons.forEach(button => {
+      // ドラッグ開始を防止
+      button.addEventListener('dragstart', (e) => {
+        e.preventDefault();
+        return false;
+      });
+
+      // マウスダウン時にドラッグを無効化
+      button.addEventListener('mousedown', (e) => {
+        // ドラッグによるウィンドウ移動を防ぐ
+        e.stopPropagation();
+        
+        // 長押しやダブルクリックでのウィンドウ移動も防ぐ
+        let dragStarted = false;
+        let mouseDownTime = Date.now();
+        
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+          // 5px以上の移動でドラッグとして判定
+          const deltaX = Math.abs(moveEvent.clientX - e.clientX);
+          const deltaY = Math.abs(moveEvent.clientY - e.clientY);
+          
+          if (deltaX > 5 || deltaY > 5) {
+            dragStarted = true;
+            // ドラッグ中はイベントをキャンセル
+            moveEvent.preventDefault();
+            moveEvent.stopPropagation();
+          }
+        };
+
+        const handleMouseUp = (upEvent: MouseEvent) => {
+          document.removeEventListener('mousemove', handleMouseMove);
+          document.removeEventListener('mouseup', handleMouseUp);
+          
+          const mouseUpTime = Date.now();
+          const holdTime = mouseUpTime - mouseDownTime;
+          
+          // 長押し（500ms以上）またはドラッグした場合はクリックイベントをキャンセル
+          if (holdTime > 500 || dragStarted) {
+            upEvent.preventDefault();
+            upEvent.stopPropagation();
+            return false;
+          }
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+      });
+
+      // ダブルクリック防止
+      button.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      });
+
+      // コンテキストメニュー（右クリック）も制御
+      button.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        return false;
+      });
+    });
+  }
+
+  /**
    * index.html に静的に配置された <img class="icon"> を inline SVG に置き換える
    * - 対象: #zoomResetBtn 内のリロードアイコン, #screenFitBtn 内のフォーカスアイコン
    */
@@ -291,6 +369,37 @@ class VDIApp {
    */
   getFolderNavigationEnabled(): boolean {
     return this.imageLoader.getFolderNavigationEnabled();
+  }
+
+  /**
+   * 処理完了した回転があるかチェックして適用
+   */
+  private async checkAndApplyCompletedRotation(imagePath: string): Promise<void> {
+    // SafetyManagerから完了した回転角度を取得
+    const completedAngle = this.rotateController.getCompletedRotation(imagePath);
+    
+    if (completedAngle !== null) {
+      console.log(`VDIApp: 処理完了した回転を適用 - ${imagePath} (${completedAngle}度)`);
+      
+      try {
+        // 回転済み画像を再読み込み
+        if (this.imageLoader) {
+          const success = await this.imageLoader.loadImageFromPath(imagePath, true);
+          if (success) {
+            // フィット処理を実行
+            setTimeout(() => {
+              this.zoomController.fitToScreen();
+              console.log(`VDIApp: 回転適用完了 - ${imagePath}`);
+            }, 100);
+            
+            // 完了データをクリーンアップ
+            this.rotateController.clearCompletedRotation(imagePath);
+          }
+        }
+      } catch (error) {
+        console.error(`VDIApp: 回転適用でエラーが発生 - ${imagePath}:`, error);
+      }
+    }
   }
 
   /**

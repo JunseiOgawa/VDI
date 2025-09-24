@@ -1,5 +1,9 @@
 # VDI(VirtualDesktopImager)
 
+
+# 開発を始めて数日ですがこちらに移行しました VDI-solid
+Link : https://github.com/JunseiOgawa/VDI-solid
+
 ## 概要
 このアプリケーションはTauriを用いて作成する、VRゴーグルでの利用に最適化されたスタンドアロン画像ビューワーです。
 
@@ -54,3 +58,4 @@ VDI.exe image.png 1280x720
 ```bash
 npm run dev:with-image -- "D:\3840x2160.png"
 ```
+
